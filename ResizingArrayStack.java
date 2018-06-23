@@ -46,7 +46,7 @@ public class ResizingArrayStack<Item> implements Iterable<Item> {
      * Initializes an empty stack.
      */
     public ResizingArrayStack() {
-        a = (Item[]) new Object[2];
+        a = (Item[]) new Object[2]; // the ugly cast…
         n = 0;
     }
 
@@ -69,7 +69,7 @@ public class ResizingArrayStack<Item> implements Iterable<Item> {
 
     // resize the underlying array holding the elements
     private void resize(int capacity) {
-        assert capacity >= n;
+        assert capacity >= n; // use asserts if you are assuming this would never happen
 
         // textbook implementation
         Item[] temp = (Item[]) new Object[capacity];
