@@ -113,7 +113,7 @@ public class Deque<Item> implements Iterable<Item> {
      */
     public Item removeLast() {
         if (isEmpty()) throw new NoSuchElementException("Stack underflow");
-        Item item = a[((last-1) % a.length)];
+        Item item = a[accessIndex(last - 1)];
         a[accessIndex(last - 1)] = null;                   // to avoid loitering
         last--;
         // shrink size of array if necessary
@@ -131,8 +131,8 @@ public class Deque<Item> implements Iterable<Item> {
     }
 
     /**
-     * Returns an iterator to this stack that iterates through the items in LIFO order.
-     * @return an iterator to this stack that iterates through the items in LIFO order.
+     * Returns an iterator to this stack that iterates through the items in FIFO order.
+     * @return an iterator to this stack that iterates through the items in FIFO order.
      */
     public Iterator<Item> iterator() {
         return new ArrayIterator();
@@ -143,7 +143,7 @@ public class Deque<Item> implements Iterable<Item> {
         private int i;
 
         public ArrayIterator() {
-            i++;
+            i = 0;
         }
 
         public boolean hasNext() {
@@ -174,5 +174,12 @@ public class Deque<Item> implements Iterable<Item> {
             else if (!stack.isEmpty()) StdOut.print(stack.removeLast() + " ");
         }
         StdOut.println("(" + stack.size() + " left on stack)");
+        // for (String s : stack)
+        //    StdOut.print(" " + s);
+        Iterator<String> iterate = stack.iterator();
+        while (iterate.hasNext()) {
+            System.out.print(iterate.next()+ " ");
+        }
+        StdOut.println();
     }
 }
