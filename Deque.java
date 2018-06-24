@@ -16,7 +16,6 @@
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.lang.IllegalArgumentException;
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
@@ -88,7 +87,7 @@ public class Deque<Item> implements Iterable<Item> {
      * @param item the item to add
      */
     public void addFirst(Item item) {
-        if ( item == null ) throw new IllegalArgumentException("addFirst must have an argument");
+        if (item == null) throw new IllegalArgumentException("addFirst must have an argument");
         if (size() == a.length) resize(2 * a.length);    // double size of array if necessary
         a[accessIndex(first--)] = item;                  // add item
     }
@@ -102,7 +101,7 @@ public class Deque<Item> implements Iterable<Item> {
      * @throws java.lang.IllegalArgumentException if argument = null
      */
     public void addLast(Item item) {
-        if ( item == null ) throw new IllegalArgumentException("addLast must have an argument");
+        if (item == null) throw new IllegalArgumentException("addLast must have an argument");
         if (size() == a.length) resize(2 * a.length);    // double size of array if necessary
         a[accessIndex(last++)] = item;                   // add item
     }
