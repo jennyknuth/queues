@@ -42,7 +42,6 @@ public class Deque<Item> implements Iterable<Item> {
     private int first;        // index of first element in deque
     private int last;         // index of last element in deque
 
-
     /**
      * Initializes an empty stack.
      */
@@ -84,14 +83,18 @@ public class Deque<Item> implements Iterable<Item> {
        // a = java.util.Arrays.copyOf(a, capacity);
     }
 
-    // /**
-    //  * Adds the item to the beginning like a queue.
-    //  * @param item the item to add
-    //  */
-    // public void addFirst(Item item) {
-    //     if (size() == a.length) resize(2*a.length);    // double size of array if necessary
-    //     a[first--] = item;                            // add item
-    // }
+    /**
+     * Adds the item to the beginning like a queue.
+     * @param item the item to add
+     */
+    public void addFirst(Item item) {
+        if ( item == null ) throw new IllegalArgumentException("addFirst must have an argument");
+        if (size() == a.length) resize(2 * a.length);    // double size of array if necessary
+        a[accessIndex(first--)] = item;                  // add item
+    }
+
+    // update head and tail modulo capacity
+    // store the value of head as a negative number but access array with modulo
 
     /**
      * Adds the item to the end like a stack.
@@ -100,8 +103,8 @@ public class Deque<Item> implements Iterable<Item> {
      */
     public void addLast(Item item) {
         if ( item == null ) throw new IllegalArgumentException("addLast must have an argument");
-        if (size() == a.length) resize(2*a.length);    // double size of array if necessary
-        a[last++] = item;                            // add item
+        if (size() == a.length) resize(2 * a.length);    // double size of array if necessary
+        a[accessIndex(last++)] = item;                   // add item
     }
 
     /**
@@ -111,14 +114,22 @@ public class Deque<Item> implements Iterable<Item> {
      */
     public Item removeLast() {
         if (isEmpty()) throw new NoSuchElementException("Stack underflow");
-        Item item = a[last-1];
-        a[last-1] = null;                              // to avoid loitering
+        Item item = a[((last-1) % a.length)];
+        a[accessIndex(last - 1)] = null;                   // to avoid loitering
         last--;
         // shrink size of array if necessary
         if (size() > 0 && size() == a.length/4) resize(a.length/2);
         return item;
     }
 
+    /**
+     * Takes the virtual index of head and tail and returns the actual index in the deque
+     * using node modulus capacity
+     * @return the actual value of the index in the deque
+     */
+    private int accessIndex(int node) {
+      return node % a.length;
+    }
 
     /**
      * Returns an iterator to this stack that iterates through the items in LIFO order.
