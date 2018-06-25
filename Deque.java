@@ -123,9 +123,27 @@ public class Deque<Item> implements Iterable<Item> {
         tail++;
     }
 
+    // TODO: add removeFirst method here
+    // TODO: add a test with addLast, addFirst, removeLast, and removeFirst
+
     /**
-     * Removes and returns the item most recently added.
-     * @return the item most recently added
+     * Removes and returns the item at the head of the deque
+     * @return the item at the head of the deque
+     * @throws java.util.NoSuchElementException if this stack is empty
+     */
+    public Item removeFirst() {
+        if (isEmpty()) throw new NoSuchElementException("Stack underflow");
+        Item item = a[(head + 1) % a.length];
+        a[(head + 1) % a.length] = null;                   // to avoid loitering
+        head++;
+        // shrink size of array if necessary
+        if (size() > 0 && size() == a.length/4) resize(a.length/2);
+        return item;
+    }
+
+    /**
+     * Removes and returns the item at the tail of the deque
+     * @return the item at the tail of the deque
      * @throws java.util.NoSuchElementException if this stack is empty
      */
     public Item removeLast() {
@@ -178,16 +196,22 @@ public class Deque<Item> implements Iterable<Item> {
         Deque<String> stack = new Deque<String>();
         while (!StdIn.isEmpty()) {
             String item = StdIn.readString();
-            if (!item.equals("-")) stack.addFirst(item);
+            if (!item.equals("-")) stack.addLast(item);
             else if (!stack.isEmpty()) StdOut.print(stack.removeLast() + " ");
         }
         StdOut.println("(" + stack.size() + " left on stack)");
-        // for (String s : stack)
-        //    StdOut.print(" " + s);
         Iterator<String> iterate = stack.iterator();
         while (iterate.hasNext()) {
             StdOut.print(iterate.next()+ " ");
         }
+        stack.addFirst("ABC");
+        stack.addFirst("DEF");
+        for (String s : stack)
+        StdOut.print(" " + s);
+        StdOut.println();
+        stack.removeFirst();
+        for (String s : stack)
+        StdOut.print(" " + s);
         StdOut.println();
     }
 }
