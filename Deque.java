@@ -12,6 +12,13 @@
  *  % java Deque < tobe.txt
  *  to be not that or be (2 left on stack)
  *
+ *  % more hyphens.txt
+ *  A B C D E - F - - G - - - H
+ *
+ *  % java Deque < hyphens.txt with addLast only
+ *  E F D G C B
+ *  A H
+ *
  ******************************************************************************/
 
 import java.util.Iterator;
@@ -20,7 +27,7 @@ import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
 
 /**
- *  The {@code Deque} class represents a last-in-first-out (LIFO) deque
+ *  The {@code Deque} class represents a tail-in-head-out (LIFO) deque
  *  of generic items.
  *  It supports <em>addFirst</em>, <em>addLast</em>, <em>removeFirst</em>, and <em>removeLast</em> operations, along with methods
  *  for testing if the deque is empty, and iterating through
@@ -38,16 +45,16 @@ import edu.princeton.cs.algs4.StdOut;
  */
 public class Deque<Item> implements Iterable<Item> {
     private Item[] a;         // array of items
-    private int first;        // index of first element in deque
-    private int last;         // index of last element in deque
+    private int head;        // index of head element in deque
+    private int tail;         // index of tail element in deque
 
     /**
      * Initializes an empty stack.
      */
     public Deque() {
         a = (Item[]) new Object[2]; // the ugly cast
-        last = 0;
-        first = 0;
+        head = 0;
+        tail = 1;
     }
 
     /**
@@ -55,7 +62,7 @@ public class Deque<Item> implements Iterable<Item> {
      * @return true if this stack is empty; false otherwise
      */
     public boolean isEmpty() {
-        return last == first;
+        return (tail - head) == 1;
     }
 
     /**
@@ -63,20 +70,27 @@ public class Deque<Item> implements Iterable<Item> {
      * @return the number of items in the stack
      */
     public int size() {
-        return last - first;
+        return (tail - head) - 1;
     }
 
 
     // resize the underlying array holding the elements
+    // also resets head to 0 and tail to size + 1
     private void resize(int capacity) {
-        assert capacity >= (last - first + 1); // use asserts if you are assuming this would never happen
+        assert capacity >= size(); // use asserts if you are assuming this would never happen
+        int previousCapacity = a.length;
 
         // textbook implementation
         Item[] temp = (Item[]) new Object[capacity]; // another cast
-        for (int i = 0; i < size(); i++) {
-            temp[i] = a[i];
+        int headPosition = (head % previousCapacity);
+        for (int i = 0; i <= size(); i++) {
+            temp[i] = a[headPosition % previousCapacity];
+            headPosition++;
         }
+        // a = null; // is this garbage collecting?
         a = temp;
+        tail = size() + 1;
+        head = 0;
 
        // alternative implementation
        // a = java.util.Arrays.copyOf(a, capacity);
@@ -88,12 +102,14 @@ public class Deque<Item> implements Iterable<Item> {
      */
     public void addFirst(Item item) {
         if (item == null) throw new IllegalArgumentException("addFirst must have an argument");
-        if (size() == a.length) resize(2 * a.length);    // double size of array if necessary
-        a[accessIndex(first--)] = item;                  // add item
+        if (size() == a.length - 1) resize(2 * a.length);    // double size of array if necessary
+        a[head % a.length] = item;                  // add item
+        head--;
+        if (head < 0) {
+          head += a.length;
+          tail += a.length;
+        }
     }
-
-    // update head and tail modulo capacity
-    // store the value of head as a negative number but access array with modulo
 
     /**
      * Adds the item to the end like a stack.
@@ -102,8 +118,9 @@ public class Deque<Item> implements Iterable<Item> {
      */
     public void addLast(Item item) {
         if (item == null) throw new IllegalArgumentException("addLast must have an argument");
-        if (size() == a.length) resize(2 * a.length);    // double size of array if necessary
-        a[accessIndex(last++)] = item;                   // add item
+        if (size() == a.length - 1) resize(2 * a.length);    // double size of array if necessary
+        a[tail % a.length] = item;                   // add item
+        tail++;
     }
 
     /**
@@ -113,21 +130,12 @@ public class Deque<Item> implements Iterable<Item> {
      */
     public Item removeLast() {
         if (isEmpty()) throw new NoSuchElementException("Stack underflow");
-        Item item = a[accessIndex(last - 1)];
-        a[accessIndex(last - 1)] = null;                   // to avoid loitering
-        last--;
+        Item item = a[(tail - 1) % a.length];
+        a[(tail - 1) % a.length] = null;                   // to avoid loitering
+        tail--;
         // shrink size of array if necessary
         if (size() > 0 && size() == a.length/4) resize(a.length/2);
         return item;
-    }
-
-    /**
-     * Takes the virtual index of head and tail and returns the actual index in the deque
-     * using node modulus capacity
-     * @return the actual value of the index in the deque
-     */
-    private int accessIndex(int node) {
-      return node % a.length;
     }
 
     /**
@@ -170,15 +178,15 @@ public class Deque<Item> implements Iterable<Item> {
         Deque<String> stack = new Deque<String>();
         while (!StdIn.isEmpty()) {
             String item = StdIn.readString();
-            if (!item.equals("-")) stack.addLast(item);
-            else if (!stack.isEmpty()) StdOut.print(stack.removeLast() + " ");
+            if (!item.equals("-")) stack.addFirst(item);
+            else if (!stack.isEmpty()) StdOut.println("output is: " + stack.removeLast() + " ");
         }
         StdOut.println("(" + stack.size() + " left on stack)");
         // for (String s : stack)
         //    StdOut.print(" " + s);
         Iterator<String> iterate = stack.iterator();
         while (iterate.hasNext()) {
-            System.out.print(iterate.next()+ " ");
+            StdOut.print(iterate.next()+ " ");
         }
         StdOut.println();
     }
