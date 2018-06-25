@@ -179,7 +179,7 @@ public class Deque<Item> implements Iterable<Item> {
         while (!StdIn.isEmpty()) {
             String item = StdIn.readString();
             if (!item.equals("-")) stack.addFirst(item);
-            else if (!stack.isEmpty()) StdOut.println("output is: " + stack.removeLast() + " ");
+            else if (!stack.isEmpty()) StdOut.print(stack.removeLast() + " ");
         }
         StdOut.println("(" + stack.size() + " left on stack)");
         // for (String s : stack)
